@@ -4,10 +4,14 @@
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
-#include "driver/gpio.h"
+//#include "driver/gpio.h"
 
 #include "scd30.h"
 #include "am312.h"
+#include "wifi.h"
+#include "mqtt_client.h"
+#include "mqtt_network.h"
+#include "network_time.h"
 
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
@@ -17,10 +21,20 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
 void app_main(void)
 {
 	//static float res[3] = {};
-
-	scd30_init();
-	scd30_info();
-	am312_init();
+	wifi_init();
+	mqtt_init();
+	network_time_init();
+	
+	for(int i = 0; i < 10; i++)
+	{
+		//mqtt_publish("Second");
+		printf("Time: %s\n", get_time());
+		sleep(2);
+	}
+	//scd30_init();
+	//scd30_info();
+	//am312_init();
+	//mqtt_init();
 	//scd30_start_period_measurement(0);
 	//vTaskDelay(100);
 	//scd30_stop_period_measurement();

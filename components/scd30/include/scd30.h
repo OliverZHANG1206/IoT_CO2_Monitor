@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "crc8.h"
+#include "esp_check.h"
 #include "data_conv.h"
 #include "driver/i2c.h"
 #include "sys/unistd.h"

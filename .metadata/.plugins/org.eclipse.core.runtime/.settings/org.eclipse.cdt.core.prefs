@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/workspace/IDF_PATH/delimiter=;
+environment/workspace/IDF_PATH/operation=replace
+environment/workspace/IDF_PATH/value=F\:/ESP-IDF/
+environment/workspace/append=true
+environment/workspace/appendContributed=true

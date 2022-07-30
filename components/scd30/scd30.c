@@ -62,8 +62,6 @@ bool scd30_receive(uint8_t *data, uint8_t size)
 	esp_err_t result = i2c_master_cmd_begin(I2C_PORT, cmd, 1000 / portTICK_RATE_MS);
 	i2c_cmd_link_delete(cmd);
 
-	if (result == ESP_ERR_TIMEOUT) printf("ACK\n");
-
 	if (result != ESP_OK) return false;
 	else return true;
 }

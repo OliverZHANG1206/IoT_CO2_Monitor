@@ -1,6 +1,8 @@
 #include "am312.h"
 
-uint8_t led_state = 0;
+static const char *TAG = "AM312";
+
+bool triggered = false;
 struct timeval start_t, end_t;
 static xQueueHandle gpio_evt_queue = NULL;
 
@@ -12,15 +14,23 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 
     if (gpio_num != AM312_GPIO) return;
 
-    led_state = !led_state;
-    gpio_set_level(2, led_state);
-
-    if (gpio_val) gettimeofday(&start_t, NULL);
-    else
+    if (gpio_val)
     {
+    	gpio_set_level(LED_PIN, ENABLE);
+    	gettimeofday(&start_t, NULL);
+    	triggered = true;
+    }
+    else if (triggered)
+    {
+    	gpio_set_level(LED_PIN, DISABLE);
     	gettimeofday(&end_t, NULL);
     	interval = (end_t.tv_sec - start_t.tv_sec) + (end_t.tv_usec - start_t.tv_usec) / 1e6 - DEAD_TIME;
     	xQueueSendFromISR(gpio_evt_queue, &interval, NULL);
+    	triggered = false;
+    }
+    else
+    {
+    	triggered = false;
     }
 }
 
@@ -34,7 +44,8 @@ static void print_task(void* arg)
         if(xQueueReceive(gpio_evt_queue, &interval, portMAX_DELAY))
         {
         	times++;
-            printf("Trigger: %d; Interval: %.3fs\n", times, interval);
+        	ESP_LOGI(TAG, "Trigger: %d; Interval: %.3fs", times, interval);
+            //printf("Trigger: %d; Interval: %.3fs\n", times, interval);
         }
     }
 
@@ -58,8 +69,8 @@ void am312_init(void)
 	gpio_evt_queue = xQueueCreate(10, sizeof(float));
 	xTaskCreate(print_task, "print_task", 2048, NULL, 10, NULL);
 
-	gpio_set_direction(2, GPIO_MODE_OUTPUT);
-	gpio_set_level(2, led_state);
+	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_level(LED_PIN, DISABLE);
 
 	if (res1 == ESP_OK && res2 == ESP_OK && res3 == ESP_OK && res4 == ESP_OK) printf("Set AM312 successfully\n");
 	else printf("Failed to set AM312.\n");
