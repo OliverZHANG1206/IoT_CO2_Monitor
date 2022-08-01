@@ -4,14 +4,15 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "crc8.h"
+#include "esp_log.h"
 #include "esp_check.h"
 #include "data_conv.h"
 #include "driver/i2c.h"
 #include "sys/unistd.h"
 
 #define I2C_PORT           0
-#define I2C_MASTER_SDA_IO  26
-#define I2C_MASTER_SCL_IO  25
+#define I2C_MASTER_SDA_IO  23
+#define I2C_MASTER_SCL_IO  22
 #define I2C_MASTER_FREQ_HZ 50000
 #define I2C_TX_BUF         0
 #define I2C_RX_BUF         0

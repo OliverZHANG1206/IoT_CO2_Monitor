@@ -3,6 +3,8 @@
 static const char *TAG = "AM312";
 
 bool triggered = false;
+static float interval = 0;
+static uint16_t times = 0;
 struct timeval start_t, end_t;
 static xQueueHandle gpio_evt_queue = NULL;
 
@@ -10,7 +12,6 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
     uint32_t gpio_num = (uint32_t) arg;
     uint16_t gpio_val = gpio_get_level(AM312_GPIO);
-    float    interval = 0;
 
     if (gpio_num != AM312_GPIO) return;
 
@@ -36,19 +37,25 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 
 static void print_task(void* arg)
 {
-    float interval = 0;
-    static uint16_t times = 0;
-
     for(;;)
     {
         if(xQueueReceive(gpio_evt_queue, &interval, portMAX_DELAY))
         {
         	times++;
         	ESP_LOGI(TAG, "Trigger: %d; Interval: %.3fs", times, interval);
-            //printf("Trigger: %d; Interval: %.3fs\n", times, interval);
         }
     }
 
+}
+
+int get_trigger_num(void)
+{
+	return times;
+}
+
+void clear_trigger_num(void)
+{
+	times = 0;
 }
 
 void am312_init(void)
@@ -72,6 +79,6 @@ void am312_init(void)
 	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_level(LED_PIN, DISABLE);
 
-	if (res1 == ESP_OK && res2 == ESP_OK && res3 == ESP_OK && res4 == ESP_OK) printf("Set AM312 successfully\n");
-	else printf("Failed to set AM312.\n");
+	if (res1 == ESP_OK && res2 == ESP_OK && res3 == ESP_OK && res4 == ESP_OK) ESP_LOGI(TAG, "Set AM312 successfully");
+	else ESP_LOGI(TAG, "Failed to set AM312.");
 }

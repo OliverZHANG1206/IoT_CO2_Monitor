@@ -1,5 +1,7 @@
 #include "scd30.h"
 
+static const char *TAG = "SCD30";
+
 void scd30_init(void)
 {
 	i2c_config_t config =
@@ -15,9 +17,9 @@ void scd30_init(void)
 	i2c_param_config(I2C_PORT, &config);
 
 	if (i2c_driver_install(I2C_PORT, I2C_MODE_MASTER, I2C_TX_BUF, I2C_RX_BUF, 0) == ESP_OK && scd30_get_version() == SCD30_VERSION)
-	    printf("Successfully Connected to SCD30 (Version = %x.%x). \n", SCD30_VERSION >> 8, (uint8_t)SCD30_VERSION);
+	    ESP_LOGI(TAG, "Successfully Connected to SCD30 (Version = %x.%x)", SCD30_VERSION >> 8, (uint8_t)SCD30_VERSION);
 	else
-		printf("Failed to Connect SCD30\n");
+		ESP_LOGI(TAG, "Failed to Connect SCD30");
 }
 
 void scd30_info(void)
@@ -107,51 +109,51 @@ bool scd30_receive_words(uint16_t* data, uint8_t size)
 
 void scd30_start_period_measurement(uint16_t pressure)
 {
-	if (scd30_send_with_args(SCD30_CMD_START_PERIODIC_MEASUREMENT, &pressure, 1)) printf("Start Period Measurement Successfully\n");
-	else printf("Failed to Start Period Measurement\n");
+	if (scd30_send_with_args(SCD30_CMD_START_PERIODIC_MEASUREMENT, &pressure, 1)) ESP_LOGI(TAG, "Start Period Measurement Successfully");
+	else ESP_LOGI(TAG, "Failed to Start Period Measurement");
 }
 
 void scd30_stop_period_measurement(void)
 {
-	if (scd30_send_without_args(SCD30_CMD_STOP_PERIODIC_MEASUREMENT)) printf("Stop Period Measurement Successfully\n");
-	else printf("Failed to Stop Period Measurement\n");
+	if (scd30_send_without_args(SCD30_CMD_STOP_PERIODIC_MEASUREMENT)) ESP_LOGI(TAG, "Stop Period Measurement Successfully");
+	else ESP_LOGI(TAG, "Failed to Stop Period Measurement");
 }
 
 void scd30_set_measurement_interval(uint16_t interval)
 {
-	if (scd30_send_with_args(SCD30_CMD_SET_MEASUREMENT_INTERVAL, &interval, 1)) printf("Set Measurement Period Successfully\n");
-	else printf("Failed to Set Measurement Period\n");
+	if (scd30_send_with_args(SCD30_CMD_SET_MEASUREMENT_INTERVAL, &interval, 1)) ESP_LOGI(TAG, "Set Measurement Period Successfully");
+	else ESP_LOGI(TAG, "Failed to Set Measurement Period");
 }
 
 void scd30_set_temperature_offset(uint16_t offset)
 {
-	if (scd30_send_with_args(SCD30_CMD_SET_TEMPERATURE_OFFSET, &offset, 1)) printf("Set Temperature Offset Successfully\n");
-	else printf("Failed to Set Temperature Offset\n");
+	if (scd30_send_with_args(SCD30_CMD_SET_TEMPERATURE_OFFSET, &offset, 1)) ESP_LOGI(TAG, "Set Temperature Offset Successfully");
+	else ESP_LOGI(TAG, "Failed to Set Temperature Offset");
 }
 
 void scd30_set_altitude(uint16_t altitude)
 {
-	if (scd30_send_with_args(SCD30_CMD_SET_ALTITUDE, &altitude, 1)) printf("Set Altitude Successfully\n");
-	else printf("Failed to Set Altitude\n");
+	if (scd30_send_with_args(SCD30_CMD_SET_ALTITUDE, &altitude, 1)) ESP_LOGI(TAG, "Set Altitude Successfully");
+	else ESP_LOGI(TAG, "Failed to Set Altitude");
 }
 
 void scd30_set_forced_recalibration(uint16_t co2_ppm)
 {
-	if (scd30_send_with_args(SCD30_CMD_SET_FORCED_RECALIBRATION, &co2_ppm, 1)) printf("Set Recalibration Successfully\n");
-	else printf("Failed to Set Recalibration\n");
+	if (scd30_send_with_args(SCD30_CMD_SET_FORCED_RECALIBRATION, &co2_ppm, 1)) ESP_LOGI(TAG, "Set Recalibration Successfully");
+	else ESP_LOGI(TAG, "Failed to Set Recalibration");
 }
 
 void scd30_set_auto_self_calibration(uint16_t status)
 {
 	if (status == SCD30_DEACTIVATE)
 	{
-		if (scd30_send_with_args(SCD30_CMD_AUTO_SELF_CALIBRATION, &status, 1)) printf("Deactivate Auto-calibration Successfully\n");
-		else printf("Failed to Deactivate Auto-calibration\n");
+		if (scd30_send_with_args(SCD30_CMD_AUTO_SELF_CALIBRATION, &status, 1)) ESP_LOGI(TAG, "Deactivate Auto-calibration Successfully");
+		else ESP_LOGI(TAG, "Failed to Deactivate Auto-calibration");
 	}
 	else
 	{
-		if (scd30_send_with_args(SCD30_CMD_AUTO_SELF_CALIBRATION, &status, 1)) printf("Activate Auto-calibration Successfully\n");
-		else printf("Failed to Activate Auto-calibration\n");
+		if (scd30_send_with_args(SCD30_CMD_AUTO_SELF_CALIBRATION, &status, 1)) ESP_LOGI(TAG, "Activate Auto-calibration Successfully");
+		else ESP_LOGI(TAG, "Failed to Activate Auto-calibration");
 	}
 }
 
@@ -224,5 +226,7 @@ void scd30_read_measurement(float* measurement)
 	measurement[0] = bytes_to_float(((uint32_t)data[0] << 16 | (uint32_t)data[1])); //CO2
 	measurement[1] = bytes_to_float(((uint32_t)data[2] << 16 | (uint32_t)data[3])); //Temperature
 	measurement[2] = bytes_to_float(((uint32_t)data[4] << 16 | (uint32_t)data[5])); //Humidity
+
+	ESP_LOGI(TAG, "Get Data %.3f %.3f %.3f", measurement[0], measurement[1], measurement[2]);
 }
 

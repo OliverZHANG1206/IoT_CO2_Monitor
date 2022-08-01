@@ -14,8 +14,8 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#define WIFI_SSID           "HUAWEI-10EOJ6"
-#define WIFI_PASSWORD       "1415926zyf"
+#define WIFI_SSID           "iebbbb"
+#define WIFI_PASSWORD       "ieb230230"
 #define WIFI_MAXIMUM_RETRY  5
 #define WIFI_CONNECTED_BIT  BIT0
 #define WIFI_FAIL_BIT       BIT1

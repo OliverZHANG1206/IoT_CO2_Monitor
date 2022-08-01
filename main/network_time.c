@@ -35,12 +35,10 @@ void network_time_init(void)
     ESP_LOGI(TAG, "Update time...");
     network_time();
     time_adj();
-    ESP_LOGI(TAG, "Update Successful");
 }
 
 void network_time(void)
 {
-    // wait for time to be set
     int retry = 0;
     const int retry_count = 10;
 
@@ -51,7 +49,9 @@ void network_time(void)
     }
 
     time(&now);
-    sntp_set_sync_status(SNTP_SYNC_STATUS_IN_PROGRESS);
+    
+    if (retry == retry_count) ESP_LOGI(TAG, "Update Failed");
+    else ESP_LOGI(TAG, "Update Successful");
 }
 
 void time_adj(void)
