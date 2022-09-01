@@ -10,7 +10,7 @@ static const char *TAG = "TIME SERVICE";
 //static void initialize_sntp(void);
 
 time_t now = 0;
-char strftime_buf[64];
+char time_buf[64];
 struct tm timeinfo = { 0 };
 
 void network_time_init(void)
@@ -72,6 +72,6 @@ char* get_time(void)
 {
     time(&now);
     localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    return strftime_buf;
+    strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    return time_buf;
 }
